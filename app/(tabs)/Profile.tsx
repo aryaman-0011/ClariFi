@@ -30,7 +30,7 @@ const Profile = () => {
           weight='fill'
         />
       ),
-      routeName: '/(modals)/profileModal',
+      routeName: '/(modals)/ProfileModal',
       bgColor: '#6366f1'
     },
     {
