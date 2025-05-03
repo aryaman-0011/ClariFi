@@ -1,5 +1,5 @@
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { colors, spacingX, spacingY } from '@/constants/theme'
 import { scale, verticalScale } from '@/utils/styling'
 import ModalWrapper from '@/components/ModalWrapper'
@@ -12,8 +12,13 @@ import Typo from '@/components/Typo'
 import Input from '@/components/Input'
 import { UserDataType } from '@/types'
 import Button from '@/components/Button'
+import { useAuth } from '@/contexts/authContext'
+import { updateUser } from '@/services/userService'
+import { useRouter } from 'expo-router'
 
 const ProfileModal = () => {
+
+    const { user, updateUserData } = useAuth()
 
     const [userData, setUserData] = useState<UserDataType>({
         name: "",
@@ -21,6 +26,14 @@ const ProfileModal = () => {
     })
 
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
+
+    useEffect(() => {
+        setUserData({
+            name: user?.name || "",
+            image: user?.image || null
+        })
+    }, [user])
 
     const onSubmit = async () => {
         let { name, image } = userData
@@ -29,7 +42,17 @@ const ProfileModal = () => {
             return
         }
 
-        console.log("good to go")
+        setLoading(true)
+        const res = await updateUser(user?.uid as string, userData)
+        setLoading(false)
+        if (res.success) {
+            // Update user
+            updateUserData(user?.uid as string)
+            router.back()
+
+        } else {
+            Alert.alert('User', res.msg)
+        }
     }
 
     return (
