@@ -13,8 +13,11 @@ import { accountOptionType } from '@/types'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { signOut } from 'firebase/auth'
 import { auth } from '@/config/firebase'
+import { useRouter } from 'expo-router'
+
 
 const Profile = () => {
+  const router = useRouter()
   const { user } = useAuth()
 
   const accountOptions: accountOptionType[] = [
@@ -90,6 +93,8 @@ const Profile = () => {
     if (item.title == 'Log Out') {
       showLogoutAlert()
     }
+
+    if(item.routeName) router.push(item.routeName)
   }
 
   return (
