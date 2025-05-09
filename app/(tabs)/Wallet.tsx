@@ -24,9 +24,11 @@ const Wallet = () => {
     orderBy("created", "desc")
   ])
 
-  const getTotalBalance = () => {
-    return 20000
-  }
+  const getTotalBalance = () =>
+    wallets.reduce((total, item) => {
+      total = total + (item.amount || 0)
+      return total
+    }, 0)
 
   return (
     <ScreenWrapper style={{ backgroundColor: colors.black }}>
@@ -66,7 +68,7 @@ const Wallet = () => {
               return <WalletListItem item={item} index={index} router={router}
               />
             }}
-            contentContainerStyle = {styles.listStyle}
+            contentContainerStyle={styles.listStyle}
           />
 
 
