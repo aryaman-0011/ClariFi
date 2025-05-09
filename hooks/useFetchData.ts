@@ -20,7 +20,7 @@ const useFetchData = <T>(
         const unsub = onSnapshot(q, (snapshot) => {
             const fetchedData = snapshot.docs.map(doc => {
                 return {
-                    idL: doc.id,
+                    id: doc.id,
                     ...doc.data()
                 }
             }) as T[]
