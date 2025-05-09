@@ -17,7 +17,7 @@ import { updateUser } from '@/services/userService'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker'
 import ImageUpload from '@/components/ImageUpload'
-import { createOrUpdateWallet } from '@/services/walletService'
+import { createOrUpdateWallet, deleteWallet } from '@/services/walletService'
 
 const WalletModal = () => {
 
@@ -77,7 +77,15 @@ const WalletModal = () => {
     }
 
     const onDelete = async () => {
-        console.log("Deleting the wallet: ", oldWallet?.id)
+        if (!oldWallet?.id) return
+        setLoading(true)
+        const res = await deleteWallet(oldWallet?.id)
+        setLoading(false)
+        if (res.success) {
+            router.back()
+        } else {
+            Alert.alert("Wallet", res.msg)
+        }
     }
 
     const showDeleteAlert = () => {
@@ -131,7 +139,7 @@ const WalletModal = () => {
                 </ScrollView>
                 {/* Footer */}
                 <View style={styles.footer}>
-                    {oldWallet?.id && (
+                    {oldWallet?.id && !loading && (
                         <View style={styles.deleteButtonWrapper}>
                             <Button onPress={showDeleteAlert} style={styles.deleteButton}>
                                 <Icons.Trash
