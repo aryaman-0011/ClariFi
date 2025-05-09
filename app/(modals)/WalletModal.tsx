@@ -59,7 +59,10 @@ const WalletModal = () => {
             uid: user?.uid
         }
 
-        // todo: include wallet id if updating
+        // include wallet id if updating
+
+        if (oldWallet?.id) data.id = oldWallet?.id
+
 
         setLoading(true)
         const res = await createOrUpdateWallet(data)
@@ -71,6 +74,27 @@ const WalletModal = () => {
         } else {
             Alert.alert('Wallet', res.msg)
         }
+    }
+
+    const onDelete = async () => {
+        console.log("Deleting the wallet: ", oldWallet?.id)
+    }
+
+    const showDeleteAlert = () => {
+        Alert.alert("Confirm", "Are you sure you want to do this? \nThis action will remove all the transactions related to this wallet",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Delete"),
+                    style: 'cancel'
+                },
+                {
+                    text: "Delete",
+                    onPress: () => onDelete(),
+                    style: 'destructive'
+                }
+            ]
+        )
     }
 
     return (
@@ -104,17 +128,33 @@ const WalletModal = () => {
                             placeholder='Upload Image'
                         />
                     </View>
-                    {/* Footer */}
-                    <View>
-                        <Button onPress={onSubmit} style={{ flex: 1 }} loading={loading}>
+                </ScrollView>
+                {/* Footer */}
+                <View style={styles.footer}>
+                    {oldWallet?.id && (
+                        <View style={styles.deleteButtonWrapper}>
+                            <Button onPress={showDeleteAlert} style={styles.deleteButton}>
+                                <Icons.Trash
+                                    color={colors.white}
+                                    size={verticalScale(24)}
+                                    weight='bold'
+                                />
+                            </Button>
+                        </View>
+                    )}
+
+                    <View style={styles.submitButtonWrapper}>
+                        <Button
+                            onPress={onSubmit}
+                            loading={loading}
+                            style={styles.submitButton}
+                        >
                             <Typo color={colors.black} fontWeight={'700'}>
-                                {
-                                    oldWallet?.id ? "Update Wallet" : "Add Wallet"
-                                }
+                                {oldWallet?.id ? "Update Wallet" : "Add Wallet"}
                             </Typo>
                         </Button>
                     </View>
-                </ScrollView>
+                </View>
             </View>
 
         </ModalWrapper>
@@ -132,15 +172,26 @@ const styles = StyleSheet.create({
     },
 
     footer: {
-        alignItems: "center",
-        flexDirection: "row",
-        justifyContent: "center",
-        paddingHorizontal: spacingX._20,
-        gap: scale(12),
-        paddingTop: spacingY._15,
-        borderTopColor: colors.neutral700,
-        marginBottom: spacingY._5,
-        borderTopWidth: 1,
+        flexDirection: 'row',
+        marginBottom: spacingY._20,
+        paddingHorizontal: spacingX._5,
+        gap: scale(10),
+        alignItems: 'center',
+    },
+    deleteButtonWrapper: {
+        width: scale(55),
+    },
+    deleteButton: {
+        backgroundColor: colors.rose,
+        paddingHorizontal: spacingX._15,
+        marginVertical: spacingY._10,
+    },
+    submitButtonWrapper: {
+        flex: 1,
+    },
+    submitButton: {
+        width: '100%',
+        marginVertical: spacingY._10,
     },
 
     form: {
