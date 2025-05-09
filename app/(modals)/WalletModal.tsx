@@ -14,7 +14,7 @@ import { UserDataType, WalletType } from '@/types'
 import Button from '@/components/Button'
 import { useAuth } from '@/contexts/authContext'
 import { updateUser } from '@/services/userService'
-import { useRouter } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker'
 import ImageUpload from '@/components/ImageUpload'
 import { createOrUpdateWallet } from '@/services/walletService'
@@ -30,6 +30,20 @@ const WalletModal = () => {
 
     const [loading, setLoading] = useState(false)
     const router = useRouter()
+
+    const oldWallet: { name: string, image: string, id: string } =
+        useLocalSearchParams()
+
+
+
+    useEffect(() => {
+        if (oldWallet?.id) {
+            setWallet({
+                name: oldWallet?.name,
+                image: oldWallet?.image
+            })
+        }
+    }, [])
 
 
     const onSubmit = async () => {
@@ -63,7 +77,7 @@ const WalletModal = () => {
         <ModalWrapper>
             <View style={styles.container}>
                 <Header
-                    title='New Wallet'
+                    title={oldWallet?.id ? "Update Wallet" : "New Wallet"}
                     leftIcon={<BackButton />}
                     style={{ marginBottom: spacingY._10 }}
                 />
@@ -93,7 +107,11 @@ const WalletModal = () => {
                     {/* Footer */}
                     <View>
                         <Button onPress={onSubmit} style={{ flex: 1 }} loading={loading}>
-                            <Typo color={colors.black} fontWeight={'700'}>Add Wallet</Typo>
+                            <Typo color={colors.black} fontWeight={'700'}>
+                                {
+                                    oldWallet?.id ? "Update Wallet" : "Add Wallet"
+                                }
+                            </Typo>
                         </Button>
                     </View>
                 </ScrollView>
