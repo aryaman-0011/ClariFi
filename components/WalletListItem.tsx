@@ -12,10 +12,21 @@ import Animated, { FadeInDown } from 'react-native-reanimated'
 const WalletListItem = ({ item, index, router }: { item: WalletType, index: number, router: Router }) => {
 
 
+    const openWallet = () => {
+        router.push({
+            pathname: "/(modals)/WalletModal",
+            params: {
+                id: item?.id,
+                name: item?.name,
+                image: item?.image
+            }
+        })
+    }
+
 
     return (
         <Animated.View entering={FadeInDown.delay(index * 50).springify().damping(13)}>
-            <TouchableOpacity style={styles.container}>
+            <TouchableOpacity style={styles.container} onPress={openWallet}>
                 <View style={styles.imageContainer}>
                     <Image
                         style={{ flex: 1 }}
