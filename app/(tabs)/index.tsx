@@ -45,7 +45,7 @@ const Home = () => {
           </View>
           <TransactionList data={[1, 2, 3, 4, 5, 6]} loading={false} emptyListMessage='No Transactions added yet!' title='Recent Transactions' />
         </ScrollView>
-        <Button style={styles.floatingButton} onPress={() => router.push}>
+        <Button style={styles.floatingButton} onPress={() => router.push('/(modals)/TransactionModal')}>
           <Icons.Plus
             color={colors.black}
             weight='bold'
