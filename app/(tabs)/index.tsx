@@ -10,9 +10,12 @@ import ScreenWrapper from '@/components/ScreenWrapper'
 import { verticalScale } from '@/utils/styling'
 import * as Icons from 'phosphor-react-native'
 import HomeCard from '@/components/HomeCard'
+import TransactionList from '@/components/TransactionList'
+import { useRouter } from 'expo-router'
 
 const Home = () => {
   const { user } = useAuth()
+  const router = useRouter()
 
   return (
     <ScreenWrapper>
@@ -40,7 +43,15 @@ const Home = () => {
           <View>
             <HomeCard />
           </View>
+          <TransactionList data={[1, 2, 3, 4, 5, 6]} loading={false} emptyListMessage='No Transactions added yet!' title='Recent Transactions' />
         </ScrollView>
+        <Button style={styles.floatingButton} onPress={() => router.push}>
+          <Icons.Plus
+            color={colors.black}
+            weight='bold'
+            size={verticalScale(24)}
+          />
+        </Button>
       </View>
     </ScreenWrapper>
   )
