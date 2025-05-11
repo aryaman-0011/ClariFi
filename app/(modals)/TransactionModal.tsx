@@ -76,33 +76,19 @@ const TransactionModal = () => {
 
 
   const onSubmit = async () => {
-    // let { name, image } = transaction
-    // if (!name.trim() || !image) {
-    //   Alert.alert("Wallet", "Please fill all the fields")
-    //   return
-    // }
+    const { type, amount, description, category, date, walletId, image } = transaction
 
-    // const data: WalletType = {
-    //   name,
-    //   image,
-    //   uid: user?.uid
-    // }
+    if (!walletId || !date || !amount || (type == 'expense' && !category)) {
+      Alert.alert("Transaction", "Please fill all the fields")
+      return
+    }
 
-    // // include wallet id if updating
+    console.log("Good to go")
 
-    // if (oldTransaction?.id) data.id = oldTransaction?.id
-
-
-    // setLoading(true)
-    // const res = await createOrUpdateWallet(data)
-    // setLoading(false)
-    // console.log('result: ', res)
-    // if (res.success) {
-    //   router.back()
-
-    // } else {
-    //   Alert.alert('Wallet', res.msg)
-    // }
+    let transactionData: TransactionType = {
+      type, amount, description, category, date, walletId, image, uid: user?.uid
+    }
+    console.log('Transaction Data: ', transactionData)
   }
 
   const onDelete = async () => {
@@ -151,7 +137,7 @@ const TransactionModal = () => {
 
           {/* Transaction Type */}
           <View style={styles.inputContainer}>
-            <Typo color={colors.neutral200}>Type</Typo>
+            <Typo color={colors.neutral200} size={16}>Type</Typo>
             {/* Dropdown Here */}
             <Dropdown
               style={styles.dropdownContainer}
@@ -179,7 +165,7 @@ const TransactionModal = () => {
 
           {/* Wallet Inputs */}
           <View style={styles.inputContainer}>
-            <Typo color={colors.neutral200}>Wallet</Typo>
+            <Typo color={colors.neutral200} size={16}>Wallet</Typo>
             {/* Dropdown Here */}
             <Dropdown
               style={styles.dropdownContainer}
@@ -211,7 +197,7 @@ const TransactionModal = () => {
           {
             transaction.type == 'expense' && (
               <View style={styles.inputContainer}>
-                <Typo color={colors.neutral200}>Expense Category</Typo>
+                <Typo color={colors.neutral200} size={16}>Expense Category</Typo>
                 {/* Dropdown Here */}
                 <Dropdown
                   style={styles.dropdownContainer}
@@ -241,7 +227,7 @@ const TransactionModal = () => {
           {/* Date Picker */}
 
           <View style={styles.inputContainer}>
-            <Typo color={colors.neutral200}>Date</Typo>
+            <Typo color={colors.neutral200} size={16}>Date</Typo>
             {
               !showDatePicker && (
                 <Pressable
@@ -280,9 +266,48 @@ const TransactionModal = () => {
             }
           </View>
 
+          {/* Amount */}
+          <View style={styles.inputContainer}>
+            <Typo color={colors.neutral200} size={16}>Amount</Typo>
+            <Input
+              // placeholder='salary'
+              keyboardType='numeric'
+              value={transaction.amount?.toString()}
+              onChangeText={(value) => setTransaction({
+                ...transaction, amount: Number(value.replace(/[^0-9]/g, ""))
+              })}
+            />
+          </View>
+
+
+          {/* Description */}
+          <View style={styles.inputContainer}>
+            <View style={styles.flexRow}>
+              <Typo color={colors.neutral200} size={16}>Description</Typo>
+              <Typo color={colors.neutral500} size={14}>(optional)</Typo>
+            </View>
+            <Input
+              // placeholder='salary'
+              value={transaction.description}
+              multiline
+              containerStyle={{
+                flexDirection: 'row',
+                height: verticalScale(100),
+                alignItems: 'flex-start',
+                paddingVertical: 15
+              }}
+              onChangeText={(value) => setTransaction({
+                ...transaction, description: value
+              })}
+            />
+          </View>
+
 
           <View style={styles.inputContainer}>
-            <Typo color={colors.neutral200}>Transaction Icon</Typo>
+            <View style={styles.flexRow}>
+              <Typo color={colors.neutral200} size={16}>Receipt</Typo>
+              <Typo color={colors.neutral500} size={14}>(optional)</Typo>
+            </View>
             {/* Image Input */}
             <ImageUpload
               file={transaction.image}
@@ -294,7 +319,7 @@ const TransactionModal = () => {
         </ScrollView>
         {/* Footer */}
         <View style={styles.footer}>
-          {oldTransaction?.id && !loading && (
+          {transaction?.id && !loading && (
             <View style={styles.deleteButtonWrapper}>
               <Button onPress={showDeleteAlert} style={styles.deleteButton}>
                 <Icons.Trash
@@ -313,7 +338,7 @@ const TransactionModal = () => {
               style={styles.submitButton}
             >
               <Typo color={colors.black} fontWeight={'700'}>
-                {oldTransaction?.id ? "Update Wallet" : "Add Wallet"}
+                {transaction?.id ? "Update" : "Submit"}
               </Typo>
             </Button>
           </View>
@@ -340,15 +365,26 @@ const styles = StyleSheet.create({
   },
 
   footer: {
-    alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: spacingX._20,
-    gap: scale(12),
-    paddingTop: spacingY._15,
-    borderTopColor: colors.neutral700,
-    marginBottom: spacingY._5,
-    borderTopWidth: 1
+    marginBottom: spacingY._20,
+    paddingHorizontal: spacingX._5,
+    gap: scale(10),
+    alignItems: 'center',
+  },
+  deleteButtonWrapper: {
+    width: scale(55),
+  },
+  deleteButton: {
+    backgroundColor: colors.rose,
+    paddingHorizontal: spacingX._15,
+    marginVertical: spacingY._10,
+  },
+  submitButtonWrapper: {
+    flex: 1,
+  },
+  submitButton: {
+    width: '100%',
+    marginVertical: spacingY._10,
   },
 
   inputContainer: {
