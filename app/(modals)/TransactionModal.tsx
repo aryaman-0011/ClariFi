@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { colors, radius, spacingX, spacingY } from '@/constants/theme'
 import { scale, verticalScale } from '@/utils/styling'
@@ -19,11 +19,15 @@ import * as ImagePicker from 'expo-image-picker'
 import ImageUpload from '@/components/ImageUpload'
 import { createOrUpdateWallet, deleteWallet } from '@/services/walletService'
 import { Dropdown } from 'react-native-element-dropdown'
-import { transactionTypes } from '@/constants/data'
+import { expenseCategories, transactionTypes } from '@/constants/data'
+import useFetchData from '@/hooks/useFetchData'
+import { orderBy, where } from 'firebase/firestore'
+import RNDateTimePicker, { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
+
 
 const TransactionModal = () => {
 
-  const { user, updateUserData } = useAuth()
+  const { user } = useAuth()
 
   const [transaction, setTransaction] = useState<TransactionType>({
     type: 'expense',
@@ -36,10 +40,28 @@ const TransactionModal = () => {
   })
 
   const [loading, setLoading] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
   const router = useRouter()
+
+  const {
+    data: wallets,
+    error: walletError,
+    loading: walletLoading,
+  } = useFetchData<WalletType>("wallets", [
+    where("uid", "==", user?.uid),
+    orderBy("created", "desc")
+  ])
+
+
 
   const oldTransaction: { name: string, image: string, id: string } =
     useLocalSearchParams()
+
+  const onDateChange = (event: any, selectedDate: any) => {
+    const currentDate = selectedDate || transaction.date
+    setTransaction({ ...transaction, date: currentDate })
+    setShowDatePicker(Platform.OS == 'ios' ? true : false)
+  }
 
 
 
@@ -127,7 +149,7 @@ const TransactionModal = () => {
         {/* Form */}
         <ScrollView contentContainerStyle={styles.form} showsVerticalScrollIndicator={false}>
 
-
+          {/* Transaction Type */}
           <View style={styles.inputContainer}>
             <Typo color={colors.neutral200}>Type</Typo>
             {/* Dropdown Here */}
@@ -153,6 +175,109 @@ const TransactionModal = () => {
 
             />
 
+          </View>
+
+          {/* Wallet Inputs */}
+          <View style={styles.inputContainer}>
+            <Typo color={colors.neutral200}>Wallet</Typo>
+            {/* Dropdown Here */}
+            <Dropdown
+              style={styles.dropdownContainer}
+              activeColor={colors.neutral700}
+              placeholderStyle={styles.dropdownPlaceholder}
+              selectedTextStyle={styles.dropdownSelectedText}
+              iconStyle={styles.dropDownIcon}
+              data={wallets.map(wallet => ({
+                label: `${wallet?.name} (₹${wallet.amount})`,
+                value: wallet?.id
+              }))}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              itemTextStyle={styles.dropdownItemText}
+              itemContainerStyle={styles.dropdownItemContainer}
+              containerStyle={styles.dropdownListContainer}
+              placeholder={'Select Wallet'}
+              value={transaction.walletId}
+              onChange={(item) => {
+                setTransaction({ ...transaction, walletId: item.value || "" })
+              }}
+
+            />
+
+          </View>
+
+          {/* Expense Categories */}
+          {
+            transaction.type == 'expense' && (
+              <View style={styles.inputContainer}>
+                <Typo color={colors.neutral200}>Expense Category</Typo>
+                {/* Dropdown Here */}
+                <Dropdown
+                  style={styles.dropdownContainer}
+                  activeColor={colors.neutral700}
+                  placeholderStyle={styles.dropdownPlaceholder}
+                  selectedTextStyle={styles.dropdownSelectedText}
+                  iconStyle={styles.dropDownIcon}
+                  data={Object.values(expenseCategories)}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  itemTextStyle={styles.dropdownItemText}
+                  itemContainerStyle={styles.dropdownItemContainer}
+                  containerStyle={styles.dropdownListContainer}
+                  placeholder={'Select Category'}
+                  value={transaction.category}
+                  onChange={(item) => {
+                    setTransaction({ ...transaction, category: item.value || "" })
+                  }}
+
+                />
+
+              </View>
+            )
+          }
+
+          {/* Date Picker */}
+
+          <View style={styles.inputContainer}>
+            <Typo color={colors.neutral200}>Date</Typo>
+            {
+              !showDatePicker && (
+                <Pressable
+                  style={styles.dateInput}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Typo size={14}>{(transaction.date as Date).toLocaleDateString()}</Typo>
+                </Pressable>
+              )
+            }
+
+            {
+              showDatePicker && (
+                <View style={Platform.OS == 'ios' && styles.iosDatePicker}>
+                  <RNDateTimePicker
+                    themeVariant='dark'
+                    value={transaction.date as Date}
+                    textColor={colors.white}
+                    mode='date'
+                    display='spinner'
+                    onChange={onDateChange}
+                  />
+
+                  {
+                    Platform.OS == 'ios' && (
+                      <TouchableOpacity
+                        style={styles.datePickerButton}
+                        onPress={() => setShowDatePicker(false)}
+                      >
+                        <Typo size={15} fontWeight={'500'}>OK</Typo>
+                      </TouchableOpacity>
+                    )
+                  }
+                </View>
+              )
+            }
           </View>
 
 
