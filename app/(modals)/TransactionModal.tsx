@@ -23,6 +23,7 @@ import { expenseCategories, transactionTypes } from '@/constants/data'
 import useFetchData from '@/hooks/useFetchData'
 import { orderBy, where } from 'firebase/firestore'
 import RNDateTimePicker, { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { createOrUpdatetransaction } from '@/services/transactionService'
 
 
 const TransactionModal = () => {
@@ -89,6 +90,17 @@ const TransactionModal = () => {
       type, amount, description, category, date, walletId, image, uid: user?.uid
     }
     console.log('Transaction Data: ', transactionData)
+
+    // todo: include the transaction id for updating
+    setLoading(true)
+    const res = await createOrUpdatetransaction(transactionData)
+
+    setLoading(false)
+    if (res.success) {
+      router.back()
+    } else {
+      Alert.alert("Transaction", res.msg)
+    }
   }
 
   const onDelete = async () => {
