@@ -1,6 +1,7 @@
 import { firestore } from "@/config/firebase";
 import { TransactionType, WalletType } from "@/types";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { uploadFileToCloudinary } from "./imageService";
 
 export const createOrUpdatetransaction = async (
     transactionData: Partial<TransactionType>
@@ -17,14 +18,29 @@ export const createOrUpdatetransaction = async (
             // Update the wallet for new transaction
             // update wallet
             let res = await updateWalletForNewTransaction(
-                walletId,
+                walletId!,
                 Number(amount!),
                 type
             )
             if (!res.success) return res
         }
 
-        return { success: true }
+        if (image) {
+            const imageUploadRes = await uploadFileToCloudinary(
+                image,
+                "transactions"
+            )
+            if (!imageUploadRes.success) {
+                return { success: false, msg: imageUploadRes.msg || 'Failed to upload receipt' }
+            }
+            transactionData.image = imageUploadRes.data
+        }
+
+        const transactionRef = id ? doc(firestore, "transaction", id) : doc(collection(firestore, "transactions"))
+
+        await setDoc(transactionRef, transactionData, { merge: true })
+
+        return { success: true, data: { ...transactionData, id: transactionRef.id } }
 
     } catch (err: any) {
         console.log('Error creating or updating the transaction: ', err)
