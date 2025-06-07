@@ -54,8 +54,20 @@ const TransactionModal = () => {
   ])
 
 
+  type paramType = {
+    id: string;
+    type: string;
+    amount: string;
+    category?: string;
+    date: string;
+    description: string;
+    image?: string;
+    uid?: string;
+    walletId: string;
+  }
 
-  const oldTransaction: { name: string, image: string, id: string } =
+
+  const oldTransaction: paramType =
     useLocalSearchParams()
 
   const onDateChange = (event: any, selectedDate: any) => {
@@ -66,14 +78,20 @@ const TransactionModal = () => {
 
 
 
-  // useEffect(() => {
-  //   if (oldTransaction?.id) {
-  //     setTransaction({
-  //       name: oldTransaction?.name,
-  //       image: oldTransaction?.image
-  //     })
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (oldTransaction?.id) {
+      setTransaction({
+        type: oldTransaction?.type,
+        amount: Number(oldTransaction.amount),
+        description: oldTransaction.description || "",
+        category: oldTransaction.category || "",
+        date: new Date(oldTransaction.date),
+        walletId: oldTransaction.walletId,
+        id: oldTransaction.id,
+        image: oldTransaction?.image
+      })
+    }
+  }, [])
 
 
   const onSubmit = async () => {
@@ -90,7 +108,7 @@ const TransactionModal = () => {
     }
 
 
-    // todo: include the transaction id for updating
+    if (oldTransaction.id) transactionData.id = oldTransaction.id
     setLoading(true)
     const res = await createOrUpdatetransaction(transactionData)
 
