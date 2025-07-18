@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react"
 import { Alert } from "react-native"
 
-const API_URL = "http://localhost:5001/api"
+const API_URL = "https://wallet-api-8g5n.onrender.com/api"
 
 export const useTransactions = (userId) => {
 
@@ -14,7 +14,7 @@ export const useTransactions = (userId) => {
         expenses: 0.
     })
 
-    const [isloading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(true)
 
 
     // useCallback is used for performance reasons, it will memorize the function
@@ -45,7 +45,7 @@ export const useTransactions = (userId) => {
 
         try {
             // Can be run in parallel
-            await Promise.all([fetchTransactions(), fetchSummary])
+            await Promise.all([fetchTransactions(), fetchSummary()])
         } catch (error) {
             console.error("Error loading dataL ", error)
         } finally {
@@ -69,6 +69,6 @@ export const useTransactions = (userId) => {
         }
     }
 
-    return { transactions, summary, isloading, loadData, deleteTransaction }
+    return { transactions, summary, isLoading, loadData, deleteTransaction }
 
 }
