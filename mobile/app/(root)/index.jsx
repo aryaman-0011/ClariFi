@@ -9,6 +9,7 @@ import { styles } from '@/assets/styles/home.styles'
 import { Ionicons } from '@expo/vector-icons'
 import BalanceCard from '@/components/BalanceCard'
 import TransactionItem from '@/components/TransactionItem'
+import NoTransactionsFound from '@/components/NoTransactionsFound'
 
 export default function Page() {
     const { user } = useUser()
@@ -67,9 +68,8 @@ export default function Page() {
                 style={styles.transactionsList}
                 contentContainerStyle={styles.transactionsListContent}
                 data={transactions}
-                renderItem={({ item }) => (
-                    <TransactionItem item={item} onDelete={handleDelete} />
-                )}
+                renderItem={({ item }) => <TransactionItem item={item} onDelete={handleDelete} />}
+                ListEmptyComponent={<NoTransactionsFound />}
             />
         </View>
     )
