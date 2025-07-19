@@ -45,6 +45,8 @@ export default function Page() {
                         <SignOutButton />
                     </View>
                 </View>
+
+                <BalanceCard summary={summary}/>
             </View>
         </View>
     )
