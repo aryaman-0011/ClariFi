@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import PageLoader from '@/components/PageLoader'
 import { styles } from '@/assets/styles/home.styles'
 import { Ionicons } from '@expo/vector-icons'
+import BalanceCard from '@/components/BalanceCard'
 
 export default function Page() {
     const { user } = useUser()
