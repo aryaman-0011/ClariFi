@@ -1,9 +1,10 @@
 // react custom hook file
 
+import { API_URL } from "@/constants/api"
 import { useCallback, useState } from "react"
 import { Alert } from "react-native"
 
-const API_URL = "https://wallet-api-8g5n.onrender.com/api"
+
 
 export const useTransactions = (userId) => {
 
